@@ -1,0 +1,7 @@
+[Unit]
+Description=Prometheus Server
+
+[Service]
+User=prometheus
+ExecStart=/opt/prometheus/prometheus/prometheus -config.file /etc/prometheus/prometheus.yml
+WorkingDirectory=/var/prometheus

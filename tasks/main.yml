@@ -1,0 +1,80 @@
+---
+# tasks file for prometheus
+
+- name: prometheus | create directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    state: directory
+  with_items:
+  - /etc/prometheus
+  - /opt/prometheus/archives
+
+- name: prometheus | create user
+  become: yes
+  user:
+    home: /opt/prometheus
+    name: prometheus
+    state: present
+    system: yes
+
+- name: prometheus | create working directory
+  become: yes
+  file:
+    path: /var/prometheus
+    state: directory
+    owner: prometheus
+    group: prometheus
+
+- name: prometheus | download server
+  become: yes
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v1.5.2/prometheus-1.5.2.linux-amd64.tar.gz
+    checksum: sha256:971c5f365c3f53f52d05729acf43962905832b33d740798094850a25645de5ae
+    dest: /opt/prometheus/archives/prometheus-1.5.2.linux-amd64.tar.gz
+    force: no
+
+- name: prometheus | install server
+  become: yes
+  unarchive:
+    src: /opt/prometheus/archives/prometheus-1.5.2.linux-amd64.tar.gz
+    dest: /opt/prometheus/
+    copy: no
+    #remote_src: yes
+
+- name: prometheus | symlink server
+  become: yes
+  file:
+    src: /opt/prometheus/prometheus-1.5.2.linux-amd64
+    path: /opt/prometheus/prometheus
+    force: yes
+    state: link
+
+- name: prometheus | create configuration file
+  become: yes
+  template:
+    dest: /etc/prometheus/prometheus.yml
+    force: yes
+    src: etc-prometheus-prometheus-yml.j2
+
+- name: prometheus | server systemd service
+  become: yes
+  copy:
+    dest: /etc/systemd/system/prometheus.service
+    force: yes
+    src: systemd-system-prometheus.service
+  notify:
+  - reload systemd
+  - restart prometheus
+
+# Flush handlers to ensure systemd is reloaded
+- name: prometheus | flush systemd handlers
+  meta: flush_handlers
+
+- name: prometheus | enable and start server systemd
+  become: yes
+  service:
+    enabled: yes
+    name: prometheus.service
+    state: started
