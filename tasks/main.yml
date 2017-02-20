@@ -14,6 +14,8 @@
     force: yes
     src: etc-prometheus-prometheus-yml.j2
   when: "{{ 'prometheus' in prometheus_components }}"
+  notify:
+  - restart prometheus
 
 - name: prometheus | alertmanager configuration file
   become: yes
@@ -22,6 +24,8 @@
     force: yes
     src: etc-prometheus-alertmanager-yml.j2
   when: "{{ 'alertmanager' in prometheus_components }}"
+  notify:
+  - restart alertmanager
 
 - name: prometheus | enable and start systemd components
   become: yes

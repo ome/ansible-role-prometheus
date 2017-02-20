@@ -37,9 +37,11 @@ ansible:
       prometheus_alertmanager_slack_channel: '#general'
       prometheus_components:
       - alertmanager
+      - node_exporter
       - prometheus
       prometheus_static_targets:
       - localhost:9090
+      - localhost:9100
       - prometheus-node:9100
 
     prometheus-node:

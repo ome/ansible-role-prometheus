@@ -9,3 +9,16 @@ prometheus_components:
 
 prometheus_static_targets:
 - 'localhost:9090'
+
+# https://github.com/prometheus/alertmanager#example
+# When a new group of alerts is created by an incoming alert, wait at
+# least 'group_wait' to send the initial notification.
+prometheus_alert_group_wait: 30s
+
+# When the first notification was sent, wait 'group_interval' to send a batch
+# of new alerts that started firing for that group.
+prometheus_alert_group_interval: 5m
+
+# If an alert has successfully been sent, wait 'repeat_interval' to
+# resend them.
+prometheus_alert_repeat_interval: 3h

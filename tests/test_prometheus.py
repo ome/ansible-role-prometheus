@@ -8,12 +8,18 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 @pytest.mark.parametrize("name", [
     "prometheus",
     "prometheus-alertmanager",
+    "prometheus-node-exporter",
 ])
 def test_services_running_and_enabled(Service, name):
     assert Service(name).is_running
     assert Service(name).is_enabled
 
 
-def test_prometheus_metrics(Command):
-    out = Command.check_output('curl http://localhost:9090/metrics')
+@pytest.mark.parametrize("address", [
+    "http://localhost:9090",
+    "http://localhost:9093",
+    "http://localhost:9100",
+])
+def test_prometheus_metrics(Command, address):
+    out = Command.check_output('curl %s/metrics' % address)
     assert 'process_cpu_seconds_total' in out
