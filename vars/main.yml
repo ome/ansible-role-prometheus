@@ -1,0 +1,18 @@
+---
+# vars file for ansible-role-prometheus
+prometheus_component_downloads:
+  alertmanager:
+    basename: alertmanager-0.5.1.linux-amd64
+    source: https://github.com/prometheus/alertmanager/releases/download/v0.5.1/alertmanager-0.5.1.linux-amd64.tar.gz
+    sha256: 9df9f0eb0061c8ead1b89060b851ea389fbdf6c1adc8513b40f6f4b90f4de932
+    service: prometheus-alertmanager
+  node_exporter:
+    basename: node_exporter-0.14.0-rc.1.linux-amd64
+    source: https://github.com/prometheus/node_exporter/releases/download/v0.14.0-rc.1/node_exporter-0.14.0-rc.1.linux-amd64.tar.gz
+    sha256: 7fe8ac67ff5b3151d41454c208d2708cf49875c6de84753046f34a1f85b8c64c
+    service: prometheus-node-exporter
+  prometheus:
+    basename: prometheus-1.5.2.linux-amd64
+    source: https://github.com/prometheus/prometheus/releases/download/v1.5.2/prometheus-1.5.2.linux-amd64.tar.gz
+    sha256: 971c5f365c3f53f52d05729acf43962905832b33d740798094850a25645de5ae
+    service: prometheus

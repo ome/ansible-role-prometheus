@@ -1,0 +1,11 @@
+---
+# defaults file for ansible-role-prometheus
+
+# https://prometheus.io/docs/introduction/overview/#components
+prometheus_components:
+- alertmanager
+- prometheus
+- node_exporter
+
+prometheus_static_targets:
+- 'localhost:9090'

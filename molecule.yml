@@ -15,6 +15,7 @@ vagrant:
         cpus: 1
   instances:
     - name: prometheus
+    - name: prometheus-node
 
 docker:
   containers:
@@ -22,6 +23,28 @@ docker:
     image: centos/systemd
     image_version: latest
     privileged: True
+  - name: prometheus-node
+    image: centos/systemd
+    image_version: latest
+    privileged: True
+
+ansible:
+
+  host_vars:
+
+    prometheus:
+      prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
+      prometheus_alertmanager_slack_channel: '#general'
+      prometheus_components:
+      - alertmanager
+      - prometheus
+      prometheus_static_targets:
+      - localhost:9090
+      - prometheus-node:9100
+
+    prometheus-node:
+      prometheus_components:
+      - node_exporter
 
 verifier:
   name: testinfra
