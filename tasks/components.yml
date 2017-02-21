@@ -61,10 +61,10 @@
 
 - name: prometheus | systemd components
   become: yes
-  copy:
+  template:
     dest: "/etc/systemd/system/{{ prometheus_component_downloads[item].service }}.service"
     force: yes
-    src: "systemd-system-{{ prometheus_component_downloads[item].service }}.service"
+    src: "systemd-system-{{ prometheus_component_downloads[item].service }}-service.j2"
   with_items:
   - "{{ prometheus_components }}"
   notify:
