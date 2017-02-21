@@ -17,6 +17,16 @@
   notify:
   - restart prometheus
 
+- name: prometheus | prometheus alert rules
+  become: yes
+  copy:
+    dest: /etc/prometheus/alert.rules
+    force: yes
+    src: etc-prometheus-alert.rules
+  when: "{{ 'prometheus' in prometheus_components }}"
+  notify:
+  - restart prometheus
+
 - name: prometheus | alertmanager configuration file
   become: yes
   template:
