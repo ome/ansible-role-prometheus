@@ -28,3 +28,9 @@ prometheus_alert_repeat_interval: 3h
 # Slack
 prometheus_alertmanager_slack_webhook:
 prometheus_alertmanager_slack_channel:
+
+
+# Blackbox exporter
+prometheus_http_2xx_internal_targets: []
+prometheus_http_2xx_external_targets: []
+prometheus_rsync_banner_targets: []

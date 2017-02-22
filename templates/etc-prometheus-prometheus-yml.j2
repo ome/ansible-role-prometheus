@@ -29,3 +29,63 @@ scrape_configs:
 
     static_configs:
       - targets: {{ prometheus_static_targets | to_json }}
+
+  # Blackbox exporter config
+  # https://michael.stapelberg.de/Artikel/prometheus-blackbox-exporter
+
+  # Internal URLs: probe every 15s
+  - job_name: blackbox_http_2xx_internal
+    scrape_interval: 15s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+    - targets: {{ prometheus_http_2xx_internal_targets | to_json }}
+    relabel_configs:
+      # Pass as url parameter
+      - source_labels: [__address__]
+        target_label: __param_target
+      # Make instance label the target
+      - source_labels: [__param_target]
+        target_label: instance
+      # Actually talk to the blackbox exporter
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  # External URLs: probe every minute
+  - job_name: blackbox_http_2xx_external
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+    - targets: {{ prometheus_http_2xx_external_targets | to_json }}
+    relabel_configs:
+      # Pass as url parameter
+      - source_labels: [__address__]
+        target_label: __param_target
+      # Make instance label the target
+      - source_labels: [__param_target]
+        target_label: instance
+      # Actually talk to the blackbox exporter
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  # Rsyncd: probe every minute
+  - job_name: blackbox_rsync_banner
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [rsync_banner]
+    static_configs:
+    - targets: {{ prometheus_rsync_banner_targets | to_json }}
+    relabel_configs:
+      # Pass as url parameter
+      - source_labels: [__address__]
+        target_label: __param_target
+      # Make instance label the target
+      - source_labels: [__param_target]
+        target_label: instance
+      # Actually talk to the blackbox exporter
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
