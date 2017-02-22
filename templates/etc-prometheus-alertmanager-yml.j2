@@ -2,8 +2,9 @@
 # See https://prometheus.io/docs/alerting/configuration/ for alternatives
 
 global:
+{% if prometheus_alertmanager_slack_webhook %}
   slack_api_url: https://hooks.slack.com/services/{{ prometheus_alertmanager_slack_webhook }}
-
+{% endif %}
 
 # https://github.com/prometheus/alertmanager#example
 route:
@@ -28,5 +29,8 @@ receivers:
 
   - name: slack-notify
 
+{% if prometheus_alertmanager_slack_webhook and prometheus_alertmanager_slack_channel %}
     slack_configs:
-      - channel: {{ prometheus_alertmanager_slack_channel }}
+      - send_resolved: true
+        channel: "{{ prometheus_alertmanager_slack_channel }}"
+{% endif %}

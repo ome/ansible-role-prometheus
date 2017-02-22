@@ -22,3 +22,8 @@ prometheus_alert_group_interval: 5m
 # If an alert has successfully been sent, wait 'repeat_interval' to
 # resend them.
 prometheus_alert_repeat_interval: 3h
+
+
+# Slack
+prometheus_alertmanager_slack_webhook:
+prometheus_alertmanager_slack_channel:
