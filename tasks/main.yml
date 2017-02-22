@@ -37,6 +37,16 @@
   notify:
   - restart alertmanager
 
+- name: prometheus | blackbox configuration file
+  become: yes
+  copy:
+    dest: /etc/prometheus/blackbox-exporter.yml
+    force: yes
+    src: etc-prometheus-blackbox-exporter.yml
+  when: "{{ 'blackbox_exporter' in prometheus_components }}"
+  notify:
+  - restart blackbox-exporter
+
 - name: prometheus | enable and start systemd components
   become: yes
   service:

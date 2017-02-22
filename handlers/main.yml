@@ -16,3 +16,9 @@
   service:
     name: prometheus-alertmanager
     state: restarted
+
+- name: restart blackbox-exporter
+  become: yes
+  service:
+    name: prometheus-blackbox-exporter
+    state: restarted

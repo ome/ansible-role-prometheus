@@ -37,6 +37,7 @@ ansible:
       prometheus_alertmanager_slack_channel: '#general'
       prometheus_components:
       - alertmanager
+      - blackbox_exporter
       - node_exporter
       - prometheus
       prometheus_static_targets:

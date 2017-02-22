@@ -4,6 +4,7 @@
 # https://prometheus.io/docs/introduction/overview/#components
 prometheus_components:
 - alertmanager
+- blackbox_exporter
 - prometheus
 - node_exporter
 
