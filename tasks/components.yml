@@ -22,7 +22,7 @@
 - name: prometheus | create working directories
   become: yes
   file:
-    path: "/var/{{ prometheus_component_downloads[item].service }}"
+    path: "/var/{{ prometheus_component_specs[item].service }}"
     state: directory
     owner: prometheus
     group: prometheus
@@ -32,9 +32,9 @@
 - name: prometheus | download components
   become: yes
   get_url:
-    url: "{{ prometheus_component_downloads[item].source }}"
-    checksum: "sha256:{{ prometheus_component_downloads[item].sha256 }}"
-    dest: "/opt/prometheus/archives/{{ prometheus_component_downloads[item].basename }}.tar.gz"
+    url: "{{ prometheus_component_specs[item].source }}"
+    checksum: "sha256:{{ prometheus_component_specs[item].sha256 }}"
+    dest: "/opt/prometheus/archives/{{ prometheus_component_specs[item].basename }}.tar.gz"
     force: no
   with_items:
   - "{{ prometheus_components }}"
@@ -42,7 +42,7 @@
 - name: prometheus | install components
   become: yes
   unarchive:
-    src: "/opt/prometheus/archives/{{ prometheus_component_downloads[item].basename }}.tar.gz"
+    src: "/opt/prometheus/archives/{{ prometheus_component_specs[item].basename }}.tar.gz"
     dest: "/opt/prometheus"
     copy: no
     #remote_src: yes
@@ -52,7 +52,7 @@
 - name: prometheus | symlink components
   become: yes
   file:
-    src: "/opt/prometheus/{{ prometheus_component_downloads[item].basename }}"
+    src: "/opt/prometheus/{{ prometheus_component_specs[item].basename }}"
     path: "/opt/prometheus/{{ item }}"
     force: yes
     state: link
@@ -62,9 +62,9 @@
 - name: prometheus | systemd components
   become: yes
   template:
-    dest: "/etc/systemd/system/{{ prometheus_component_downloads[item].service }}.service"
+    dest: "/etc/systemd/system/{{ prometheus_component_specs[item].service }}.service"
     force: yes
-    src: "systemd-system-{{ prometheus_component_downloads[item].service }}-service.j2"
+    src: "systemd-system-{{ prometheus_component_specs[item].service }}-service.j2"
   with_items:
   - "{{ prometheus_components }}"
   notify:

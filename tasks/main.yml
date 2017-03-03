@@ -51,7 +51,7 @@
   become: yes
   service:
     enabled: yes
-    name: "{{ prometheus_component_downloads[item].service }}.service"
+    name: "{{ prometheus_component_specs[item].service }}.service"
     state: started
   with_items:
   - "{{ prometheus_components }}"

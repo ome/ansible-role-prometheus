@@ -1,6 +1,6 @@
 ---
 # vars file for ansible-role-prometheus
-prometheus_component_downloads:
+prometheus_component_specs:
 
   alertmanager:
     basename: alertmanager-0.5.1.linux-amd64
