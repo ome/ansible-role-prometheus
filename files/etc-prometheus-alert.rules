@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 # Prometheus Alert rules
 # https://thenewstack.io/contributing-prometheus-history-alertmanager/
 

@@ -5,6 +5,7 @@
 prometheus_components:
 - alertmanager
 - blackbox_exporter
+- jmx_javaagent
 - prometheus
 - node_exporter
 

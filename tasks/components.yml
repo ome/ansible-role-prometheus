@@ -10,6 +10,7 @@
   with_items:
   - /etc/prometheus
   - /opt/prometheus/archives
+  - /opt/prometheus/jars
 
 - name: prometheus | create user
   become: yes
@@ -26,6 +27,7 @@
     state: directory
     owner: prometheus
     group: prometheus
+  when: "{{ prometheus_component_specs[item].service is defined }}"
   with_items:
   - "{{ prometheus_components }}"
 
@@ -34,28 +36,51 @@
   get_url:
     url: "{{ prometheus_component_specs[item].source }}"
     checksum: "sha256:{{ prometheus_component_specs[item].sha256 }}"
-    dest: "/opt/prometheus/archives/{{ prometheus_component_specs[item].basename }}.tar.gz"
+    dest: "/opt/prometheus/archives/{{ prometheus_component_specs[item].source | basename }}"
     force: no
   with_items:
   - "{{ prometheus_components }}"
 
-- name: prometheus | install components
+- name: prometheus | install components targz
   become: yes
   unarchive:
     src: "/opt/prometheus/archives/{{ prometheus_component_specs[item].basename }}.tar.gz"
     dest: "/opt/prometheus"
     copy: no
     #remote_src: yes
+  when: "{{ prometheus_component_specs[item].filetype == 'targz' }}"
   with_items:
   - "{{ prometheus_components }}"
 
-- name: prometheus | symlink components
+- name: prometheus | symlink components targz
   become: yes
   file:
     src: "/opt/prometheus/{{ prometheus_component_specs[item].basename }}"
     path: "/opt/prometheus/{{ item }}"
     force: yes
     state: link
+  when: "{{ prometheus_component_specs[item].filetype == 'targz' }}"
+  with_items:
+  - "{{ prometheus_components }}"
+
+- name: prometheus | install components jar
+  become: yes
+  copy:
+    src: "/opt/prometheus/archives/{{ prometheus_component_specs[item].basename }}"
+    dest: "/opt/prometheus/jars/{{ prometheus_component_specs[item].basename }}"
+    remote_src: yes
+  when: "{{ prometheus_component_specs[item].filetype == 'jar' }}"
+  with_items:
+  - "{{ prometheus_components }}"
+
+- name: prometheus | symlink components jar
+  become: yes
+  file:
+    src: "/opt/prometheus/jars/{{ prometheus_component_specs[item].basename }}"
+    path: "/opt/prometheus/jars/{{ item }}.jar"
+    force: yes
+    state: link
+  when: "{{ prometheus_component_specs[item].filetype == 'jar' }}"
   with_items:
   - "{{ prometheus_components }}"
 
@@ -65,6 +90,7 @@
     dest: "/etc/systemd/system/{{ prometheus_component_specs[item].service }}.service"
     force: yes
     src: "systemd-system-{{ prometheus_component_specs[item].service }}-service.j2"
+  when: "{{ prometheus_component_specs[item].service is defined }}"
   with_items:
   - "{{ prometheus_components }}"
   notify:

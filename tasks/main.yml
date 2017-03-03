@@ -47,12 +47,21 @@
   notify:
   - restart blackbox-exporter
 
+- name: prometheus | jmx javaagent configuration file
+  become: yes
+  copy:
+    dest: /etc/prometheus/jmx-default-config.yml
+    force: yes
+    src: etc-prometheus-jmx-default-config.yml
+  when: "{{ 'jmx_javaagent' in prometheus_components }}"
+
 - name: prometheus | enable and start systemd components
   become: yes
   service:
     enabled: yes
     name: "{{ prometheus_component_specs[item].service }}.service"
     state: started
+  when: "{{ prometheus_component_specs[item].service is defined }}"
   with_items:
   - "{{ prometheus_components }}"
 

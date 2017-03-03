@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 # https://github.com/prometheus/blackbox_exporter
 
 modules:
