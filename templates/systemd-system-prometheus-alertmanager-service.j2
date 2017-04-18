@@ -1,7 +1,0 @@
-[Unit]
-Description=Prometheus Alertmanager
-
-[Service]
-User=prometheus
-ExecStart=/opt/prometheus/alertmanager/alertmanager -config.file /etc/prometheus/alertmanager.yml
-WorkingDirectory=/var/prometheus-alertmanager

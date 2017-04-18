@@ -1,7 +1,9 @@
 Prometheus
 ==========
 
-Prometheus monitoring server
+Prometheus monitoring server.
+
+This includes prometheus, alertmanager and blackbox-exporter.
 
 
 Example playbook

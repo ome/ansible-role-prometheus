@@ -1,11 +1,15 @@
 ---
 # tasks file for prometheus
 
-- include: components.yml
-
-# Flush handlers to ensure systemd is reloaded
-- name: prometheus | flush systemd handlers
-  meta: flush_handlers
+- name: prometheus | create directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    state: directory
+  with_items:
+  - /etc/prometheus
+  - /etc/prometheus/targets
 
 - name: prometheus | prometheus configuration file
   become: yes
@@ -13,9 +17,7 @@
     dest: /etc/prometheus/prometheus.yml
     force: yes
     src: etc-prometheus-prometheus-yml.j2
-  when: "{{ 'prometheus' in prometheus_components }}"
-  notify:
-  - restart prometheus
+  register: prometheus_configuration
 
 - name: prometheus | prometheus alert rules
   become: yes
@@ -23,9 +25,7 @@
     dest: /etc/prometheus/alert.rules
     force: yes
     src: etc-prometheus-alert.rules
-  when: "{{ 'prometheus' in prometheus_components }}"
-  notify:
-  - restart prometheus
+  register: prometheus_alert_rules
 
 - name: prometheus | alertmanager configuration file
   become: yes
@@ -33,9 +33,7 @@
     dest: /etc/prometheus/alertmanager.yml
     force: yes
     src: etc-prometheus-alertmanager-yml.j2
-  when: "{{ 'alertmanager' in prometheus_components }}"
-  notify:
-  - restart alertmanager
+  register: prometheus_alertmanager_configuration
 
 - name: prometheus | blackbox configuration file
   become: yes
@@ -43,26 +41,77 @@
     dest: /etc/prometheus/blackbox-exporter.yml
     force: yes
     src: etc-prometheus-blackbox-exporter.yml
-  when: "{{ 'blackbox_exporter' in prometheus_components }}"
-  notify:
-  - restart blackbox-exporter
+  register: prometheus_blackboxexporter_configuration
 
-- name: prometheus | jmx javaagent configuration file
-  become: yes
-  copy:
-    dest: /etc/prometheus/jmx-default-config.yml
-    force: yes
-    src: etc-prometheus-jmx-default-config.yml
-  when: "{{ 'jmx_javaagent' in prometheus_components }}"
 
-- name: prometheus | enable and start systemd components
+# Docker containers
+
+- name: prometheus | docker-python
   become: yes
-  service:
-    enabled: yes
-    name: "{{ prometheus_component_specs[item].service }}.service"
-    state: started
-  when: "{{ prometheus_component_specs[item].service is defined }}"
+  yum:
+    name: docker-python
+    state: present
+
+- name: pull an image
+  docker_image:
+    name: "{{ item }}"
   with_items:
-  - "{{ prometheus_components }}"
+  - prom/alertmanager
+  - prom/blackbox-exporter
+  - prom/prometheus
 
-# TODO: restart if systemd.service files changed?
+- name: prometheus | docker alertmanager
+  become: yes
+  docker_container:
+    command: >
+      -config.file=/etc/prometheus/alertmanager.yml
+      -storage.path=/alertmanager
+    image: prom/alertmanager
+    name: alertmanager
+    published_ports:
+    - 9093:9093
+    #read_only: True
+    restart: "{{ prometheus_alertmanager_configuration.changed }}"
+    restart_policy: on-failure
+    state: started
+    volumes:
+    - /etc/prometheus/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
+    - alertmanager-data:/alertmanager
+
+- name: prometheus | docker blackbox-exporter
+  become: yes
+  docker_container:
+    command: "-config.file=/etc/prometheus/blackbox-exporter.yml"
+    image: prom/blackbox-exporter
+    name: blackbox-exporter
+    published_ports:
+    - 9115:9115
+    #read_only: True
+    restart: "{{ prometheus_blackboxexporter_configuration.changed }}"
+    restart_policy: on-failure
+    state: started
+    volumes:
+    - /etc/prometheus/blackbox-exporter.yml:/etc/prometheus/blackbox-exporter.yml:ro
+
+- name: prometheus | docker prometheus
+  become: yes
+  docker_container:
+    command: >
+      -config.file=/etc/prometheus/prometheus.yml
+      -storage.local.path=/prometheus
+      -web.console.libraries=/usr/share/prometheus/console_libraries
+      -web.console.templates=/usr/share/prometheus/consoles
+    image: prom/prometheus
+    links:
+    - alertmanager:alertmanager
+    - blackbox-exporter:blackbox-exporter
+    name: prometheus
+    published_ports:
+    - 9090:9090
+    #read_only: True
+    restart: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"
+    restart_policy: on-failure
+    state: started
+    volumes:
+    - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - prometheus-data:/prometheus
