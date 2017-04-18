@@ -1,4 +1,8 @@
 ---
+dependency:
+  name: galaxy
+  requirements_file: tests/requirements.yml
+
 # Default driver
 driver:
   name: docker
@@ -15,7 +19,6 @@ vagrant:
         cpus: 1
   instances:
     - name: prometheus
-    - name: prometheus-node
 
 docker:
   containers:
@@ -23,29 +26,23 @@ docker:
     image: centos/systemd
     image_version: latest
     privileged: True
-  - name: prometheus-node
-    image: centos/systemd
-    image_version: latest
-    privileged: True
+    ansible_groups:
+    - docker-hosts
 
 ansible:
+
+  group_vars:
+    docker-hosts:
+      # This should allow docker-in-docker to work
+      docker_storage_driver: vfs
 
   host_vars:
 
     prometheus:
       prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
       prometheus_alertmanager_slack_channel: '#general'
-      prometheus_components:
-      - alertmanager
-      - blackbox_exporter
-      - jmx_javaagent
-      - node_exporter
-      - prometheus
       prometheus_static_targets:
       - localhost:9090
-      - localhost:9100
-      - prometheus-node:9100
-      # TODO: Test jmx_exporter
       prometheus_http_2xx_internal_targets:
       - http://idr-demo.openmicroscopy.org/about/
       prometheus_http_2xx_external_targets:
@@ -54,9 +51,6 @@ ansible:
       prometheus_rsync_banner_targets:
       - idr-rsync.openmicroscopy.org:873
 
-    prometheus-node:
-      prometheus_components:
-      - node_exporter
 
 verifier:
   name: testinfra

@@ -1,3 +1,4 @@
+---
 sudo: required
 language: python
 
@@ -5,7 +6,7 @@ services:
   - docker
 
 install:
-  - pip install ansible docker-py molecule==1.20
+  - pip install ome-ansible-molecule-dependencies
 
 script:
   - molecule test

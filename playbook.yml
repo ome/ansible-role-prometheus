@@ -1,4 +1,9 @@
 ---
+# Run docker role first to ensure all handlers are triggered
+- hosts: all
+  roles:
+    - role: openmicroscopy.docker
+
 - hosts: all
   roles:
     - role: ansible-role-prometheus
