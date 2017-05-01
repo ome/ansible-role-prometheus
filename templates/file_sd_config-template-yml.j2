@@ -1,0 +1,3 @@
+- targets: {{ item.hosts | json_query("map(&join(':', [@, '" + item.port + "']), @)") | to_json }}
+  labels:
+    job: {{ item.jobname }}

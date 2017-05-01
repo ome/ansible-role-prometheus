@@ -90,3 +90,10 @@ scrape_configs:
       # Actually talk to the blackbox exporter
       - target_label: __address__
         replacement: blackbox-exporter:9115
+
+  # Other target files
+  # (reloaded automatically, can be used for dynamic updates)
+  - job_name: additional targets
+    file_sd_configs:
+    - files:
+      - "/etc/prometheus/targets/*.yml"

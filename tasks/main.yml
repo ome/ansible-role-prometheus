@@ -43,6 +43,14 @@
     src: etc-prometheus-blackbox-exporter.yml
   register: prometheus_blackboxexporter_configuration
 
+- name: prometheus | file sd configs
+  become: yes
+  template:
+    dest: /etc/prometheus/targets/{{ item.groupname }}.yml
+    force: yes
+    src: file_sd_config-template-yml.j2
+  with_items:
+    - "{{ prometheus_targets }}"
 
 # Docker containers
 
@@ -109,9 +117,10 @@
     published_ports:
     - 9090:9090
     #read_only: True
-    restart: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"
+    recreate: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"
     restart_policy: on-failure
     state: started
     volumes:
     - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - /etc/prometheus/targets:/etc/prometheus/targets:ro
     - prometheus-data:/prometheus
