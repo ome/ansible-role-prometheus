@@ -79,7 +79,7 @@
     published_ports:
     - 9093:9093
     #read_only: True
-    restart: "{{ prometheus_alertmanager_configuration.changed }}"
+    recreate: "{{ prometheus_alertmanager_configuration.changed }}"
     restart_policy: on-failure
     state: started
     volumes:
@@ -95,7 +95,7 @@
     published_ports:
     - 9115:9115
     #read_only: True
-    restart: "{{ prometheus_blackboxexporter_configuration.changed }}"
+    recreate: "{{ prometheus_blackboxexporter_configuration.changed }}"
     restart_policy: on-failure
     state: started
     volumes:
