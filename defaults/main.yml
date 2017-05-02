@@ -4,6 +4,8 @@
 prometheus_static_targets:
 - 'localhost:9090'
 
+prometheus_targets: []
+
 # https://github.com/prometheus/alertmanager#example
 # When a new group of alerts is created by an incoming alert, wait at
 # least 'group_wait' to send the initial notification.
