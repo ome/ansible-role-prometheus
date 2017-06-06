@@ -1,3 +1,19 @@
-- targets: {{ item.hosts | json_query("map(&join(':', [@, '" + item.port + "']), @)") | to_json }}
+{% if 'hosts' in item %}
+- targets: {{ item.hosts | json_query("map(&join(':', [@, '" + (item.port | string) + "']), @)") | to_json }}
   labels:
     job: {{ item.jobname }}
+{% endif %}
+
+{% for group in item.groups | default([]) %}
+{%   for host in groups[group] | default([]) %}
+- targets:
+  - {{
+      (hostvars[host][
+        'ansible_' + (item.iface | default('eth0'))].ipv4.address +
+        ":" + (item.port | string)) | to_json
+    }}
+  labels:
+    job: {{ item.jobname }}
+    instance: {{ hostvars[host].ansible_hostname }}
+{%   endfor %}
+{% endfor %}
