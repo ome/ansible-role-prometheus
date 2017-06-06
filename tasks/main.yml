@@ -61,6 +61,7 @@
     state: present
 
 - name: pull an image
+  become: yes
   docker_image:
     name: "{{ item }}"
   with_items:
