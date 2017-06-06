@@ -110,6 +110,7 @@
       -storage.local.path=/prometheus
       -web.console.libraries=/usr/share/prometheus/console_libraries
       -web.console.templates=/usr/share/prometheus/consoles
+      -alertmanager.url=http://alertmanager:9093
     image: prom/prometheus
     links:
     - alertmanager:alertmanager
@@ -122,6 +123,7 @@
     restart_policy: on-failure
     state: started
     volumes:
+    - /etc/prometheus/alert.rules:/etc/prometheus/alert.rules:ro
     - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     - /etc/prometheus/targets:/etc/prometheus/targets:ro
     - prometheus-data:/prometheus
