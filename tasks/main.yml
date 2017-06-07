@@ -125,7 +125,28 @@
     volumes:
     # We could mount /etc/prometheus instead but the Docker image contains
     # additional (optional) files
-    - /etc/prometheus/rules:/etc/prometheus/rules:ro
+    - /etc/prometheus/rules/:/etc/prometheus/rules/:ro
     - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    - /etc/prometheus/targets:/etc/prometheus/targets:ro
+    - /etc/prometheus/targets/:/etc/prometheus/targets/:ro
     - prometheus-data:/prometheus
+
+# In certain situations if a manual change means Prometheus in Docker
+# auto restarted but a host mounted file wasn't present it'll be auto
+# created as a directory instead of a file.
+- name: prometheus | check docker host file mounts
+  stat:
+    path: "{{ item }}"
+  with_items:
+  - /etc/prometheus/alertmanager.yml
+  - /etc/prometheus/blackbox-exporter.yml
+  - /etc/prometheus/prometheus.yml
+  register: prometheus_docker_file_mounts
+
+- name: prometheus | assert docker host file mounts
+  assert:
+    that: 'item.stat.isreg'
+  with_items: "{{ prometheus_docker_file_mounts.results }}"
+  # This is a sanity check so use no_log to reduce the excessive log output
+  # (there's nothing senstive in there)
+  # The asserts will be in the same order as the previous task
+  no_log: true
