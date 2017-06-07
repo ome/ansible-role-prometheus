@@ -65,9 +65,9 @@
   docker_image:
     name: "{{ item }}"
   with_items:
-  - prom/alertmanager
-  - prom/blackbox-exporter
-  - prom/prometheus
+  - prom/alertmanager:v0.6.2
+  - prom/blackbox-exporter:v0.5.0
+  - prom/prometheus:v1.7.0
 
 - name: prometheus | docker alertmanager
   become: yes
