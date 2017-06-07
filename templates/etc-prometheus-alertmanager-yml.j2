@@ -1,8 +1,11 @@
 # {{ ansible_managed }}
 # Prometheus Alertmanager configuration
 # See https://prometheus.io/docs/alerting/configuration/ for alternatives
+# see https://github.com/prometheus/alertmanager/blob/v0.6.2/template/template.go#L218
+# for available alert fields
 
 global:
+  #resolve_timeout:
 {% if prometheus_alertmanager_slack_webhook %}
   slack_api_url: https://hooks.slack.com/services/{{ prometheus_alertmanager_slack_webhook }}
 {% endif %}
@@ -16,22 +19,59 @@ route:
 
 # https://www.robustperception.io/using-slack-with-the-alertmanager/
 
-  group_by: [cluster]
+  group_by: [jobname, instance]
+
   # If an alert isn't caught by a route, send it slack.
   receiver: slack-notify
+
+  # Different slack config depending on severity label
   routes:
-  # Send severity=slack alerts to slack.
     - match:
-        severity: slack
+        severity: warn
       receiver: slack-notify
+
+    - match:
+        severity: error
+      receiver: slack-notify-important
+
+
+# Mute warn notification if there is already an error notification
+inhibit_rules:
+- source_match:
+    severity: 'error'
+  target_match:
+    severity: 'warn'
+  # Apply inhibition if the alertname is the same.
+  equal: ['alertname']
 
 
 receivers:
 
   - name: slack-notify
-
-{% if prometheus_alertmanager_slack_webhook and prometheus_alertmanager_slack_channel %}
     slack_configs:
       - send_resolved: true
         channel: "{{ prometheus_alertmanager_slack_channel }}"
-{% endif %}
+        username: "Prometheus Alertmanager"
+{% raw %}
+        color: '{{ if eq .Status "firing" }}warning{{ else }}good{{ end }}'
+        pretext: '{{ template "slack.default.title" . }}'
+        title: '{{ range .Alerts }}{{ .Annotations.summary }} {{ end }}'
+        text: |
+          {{ range .Alerts }}{{ .Annotations.description }} (Since: {{ .StartsAt }}) {{ end }}
+{% endraw %}
+
+  - name: slack-notify-important
+    slack_configs:
+      - send_resolved: true
+        channel: "{{ prometheus_alertmanager_slack_channel }}"
+        username: "Prometheus Alertmanager"
+{% raw %}
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+        pretext: '{{ template "slack.default.title" . }}'
+        title: '{{ range .Alerts }}{{ .Annotations.summary }} {{ end }}'
+        text: |
+          {{ range .Alerts }}{{ .Annotations.description }} (Since: {{ .StartsAt }}) {{ end }}
+
+          Group labels: {{ .GroupLabels }}
+          Common labels: {{ .CommonLabels }}
+{% endraw %}
