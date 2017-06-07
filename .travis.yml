@@ -6,7 +6,12 @@ services:
   - docker
 
 install:
-  - pip install ome-ansible-molecule-dependencies
+  # Ansible 2.2 has a bug that causes task prometheus | docker alertmanager
+  # to fail when evaluating
+  # prometheus_alertmanager_configuration.changed
+  # https://github.com/ansible/ansible/issues/20568
+  #- pip install ome-ansible-molecule-dependencies
+  - pip install ansible==2.3.1.0 docker molecule==1.24
 
 script:
   - molecule test
