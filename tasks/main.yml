@@ -5,10 +5,10 @@
   become: yes
   file:
     path: "{{ item }}"
-    recurse: yes
     state: directory
   with_items:
   - /etc/prometheus
+  - /etc/prometheus/rules
   - /etc/prometheus/targets
 
 - name: prometheus | prometheus configuration file
@@ -22,9 +22,9 @@
 - name: prometheus | prometheus alert rules
   become: yes
   copy:
-    dest: /etc/prometheus/alert.rules
+    dest: /etc/prometheus/rules/default-alert.rules
     force: yes
-    src: etc-prometheus-alert.rules
+    src: etc-prometheus-default-alert.rules
   register: prometheus_alert_rules
 
 - name: prometheus | alertmanager configuration file
@@ -123,7 +123,9 @@
     restart_policy: on-failure
     state: started
     volumes:
-    - /etc/prometheus/alert.rules:/etc/prometheus/alert.rules:ro
+    # We could mount /etc/prometheus instead but the Docker image contains
+    # additional (optional) files
+    - /etc/prometheus/rules:/etc/prometheus/rules:ro
     - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     - /etc/prometheus/targets:/etc/prometheus/targets:ro
     - prometheus-data:/prometheus
