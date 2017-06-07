@@ -22,7 +22,7 @@ prometheus_alert_repeat_interval: 3h
 
 # Slack
 prometheus_alertmanager_slack_webhook:
-prometheus_alertmanager_slack_channel:
+prometheus_alertmanager_slack_channel: '#random'
 
 
 # Blackbox exporter
