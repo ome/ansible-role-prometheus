@@ -49,7 +49,7 @@ ansible:
       - http://idr.openmicroscopy.org/about/
       - https://idr.openmicroscopy.org/about/
       prometheus_rsync_banner_targets:
-      - idr-rsync.openmicroscopy.org:873
+      - idr.openmicroscopy.org:873
 
 
 verifier:
