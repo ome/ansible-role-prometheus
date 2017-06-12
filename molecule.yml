@@ -44,12 +44,12 @@ ansible:
       prometheus_static_targets:
       - localhost:9090
       prometheus_http_2xx_internal_targets:
-      - http://idr-demo.openmicroscopy.org/about/
+      - http://idr.openmicroscopy.org/about/
       prometheus_http_2xx_external_targets:
-      - http://idr-demo.openmicroscopy.org/about/
-      - https://idr-demo.openmicroscopy.org/about/
+      - http://idr.openmicroscopy.org/about/
+      - https://idr.openmicroscopy.org/about/
       prometheus_rsync_banner_targets:
-      - idr-rsync.openmicroscopy.org:873
+      - idr.openmicroscopy.org:873
 
 
 verifier:

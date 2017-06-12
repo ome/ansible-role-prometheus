@@ -1,9 +1,8 @@
 Prometheus
 ==========
 
-Prometheus monitoring server.
-
-This includes prometheus, alertmanager and blackbox-exporter.
+Prometheus monitoring server, includes prometheus, alertmanager and blackbox-exporter.
+This requires docker to be running (not handled by this role).
 
 This role is still in development.
 
@@ -17,6 +16,7 @@ Parameters
   - `hosts`: A list of hosts (optional)
   - `port`: The port to be monitored
   - `jobname`: The prometheus job-name
+
   This is intended to be an example.
   In practice these configuration files could be dynamically generated outside this role, prometheus will automatically reload them.
 
@@ -26,6 +26,7 @@ Example playbook
 
     - hosts: localhost
       roles:
+      - role: openmicroscopy.docker
       - role: prometheus
 
 
