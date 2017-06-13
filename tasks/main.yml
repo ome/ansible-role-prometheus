@@ -81,7 +81,7 @@
     - 9093:9093
     #read_only: True
     recreate: "{{ prometheus_alertmanager_configuration.changed }}"
-    restart_policy: on-failure
+    restart_policy: always
     state: started
     volumes:
     - /etc/prometheus/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
@@ -97,7 +97,7 @@
     - 9115:9115
     #read_only: True
     recreate: "{{ prometheus_blackboxexporter_configuration.changed }}"
-    restart_policy: on-failure
+    restart_policy: always
     state: started
     volumes:
     - /etc/prometheus/blackbox-exporter.yml:/etc/prometheus/blackbox-exporter.yml:ro
@@ -120,7 +120,7 @@
     - 9090:9090
     #read_only: True
     recreate: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"
-    restart_policy: on-failure
+    restart_policy: always
     state: started
     volumes:
     # We could mount /etc/prometheus instead but the Docker image contains
