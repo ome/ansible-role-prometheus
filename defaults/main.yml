@@ -6,6 +6,8 @@ prometheus_static_targets:
 
 prometheus_targets: []
 
+prometheus_sd_targets: []
+
 # https://github.com/prometheus/alertmanager#example
 # When a new group of alerts is created by an incoming alert, wait at
 # least 'group_wait' to send the initial notification.

@@ -50,7 +50,7 @@
     force: yes
     src: file_sd_config-template-yml.j2
   with_items:
-    - "{{ prometheus_targets }}"
+    - "{{ prometheus_sd_targets }}"
 
 # Docker containers
 
