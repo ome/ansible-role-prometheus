@@ -1,5 +1,6 @@
 import testinfra.utils.ansible_runner
 import pytest
+import json
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     '.molecule/ansible_inventory').get_hosts('all')
@@ -8,8 +9,10 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 def test_docker_running(Sudo, Command):
     with Sudo():
         out = Command.check_output("docker ps --format '{{.Names}}'")
-    names = sorted(out.split())
-    assert names == ['alertmanager', 'blackbox-exporter', 'prometheus']
+    names = out.split()
+    assert 'alertmanager' in names
+    assert 'blackbox-exporter' in names
+    assert 'prometheus' in names
 
 
 def test_docker_volumes(Sudo, Command):
@@ -33,3 +36,13 @@ def test_prometheus_targets(Command):
     out = Command.check_output('curl http://localhost:9090/targets')
     assert 'http://localhost:9090/metrics' in out
     assert 'http://blackbox-exporter:9115/probe' in out
+
+
+def test_alternative_metrics(Command):
+    out = Command.check_output(
+        'curl http://localhost:9090/api/v1/query?query=up')
+    assert 'fake-metrics' in out
+    out = Command.check_output(
+        'curl http://localhost:9090/api/v1/query?query=fake_metric_value')
+    r = json.loads(out)
+    assert r['data']['result'][0]['value'][1] == '5'

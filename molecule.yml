@@ -36,21 +36,6 @@ ansible:
       # This should allow docker-in-docker to work
       docker_storage_driver: vfs
 
-  host_vars:
-
-    prometheus:
-      prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
-      prometheus_alertmanager_slack_channel: '#general'
-      prometheus_static_targets:
-      - localhost:9090
-      prometheus_http_2xx_internal_targets:
-      - http://idr.openmicroscopy.org/about/
-      prometheus_http_2xx_external_targets:
-      - http://idr.openmicroscopy.org/about/
-      - https://idr.openmicroscopy.org/about/
-      prometheus_rsync_banner_targets:
-      - idr.openmicroscopy.org:873
-
 
 verifier:
   name: testinfra

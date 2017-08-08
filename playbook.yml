@@ -4,6 +4,53 @@
   roles:
     - role: openmicroscopy.docker
 
+# Setup some fake metrics using nginx
+  tasks:
+
+  - name: create fake metric file
+    become: yes
+    copy:
+      content: fake_metric_value 5
+      dest: /srv/alternative-metrics
+
+  - name: fake metric server
+    become: yes
+    docker_container:
+      image: nginx
+      name: fake-metrics
+      published_ports:
+      - 54321:80
+      state: started
+      volumes:
+      - /srv/:/usr/share/nginx/html/:ro
+
+
+# Finally, install this role
 - hosts: all
+
+  pre_tasks:
+
+  - name: Workaround to get host IP inside docker
+    command: hostname -i
+    register: hostname_ip
+    check_mode: no
+    changed_when: no
+
   roles:
-    - role: ansible-role-prometheus
+  - role: ansible-role-prometheus
+    prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
+    prometheus_alertmanager_slack_channel: '#general'
+    prometheus_static_targets:
+    - localhost:9090
+    prometheus_http_2xx_internal_targets:
+    - http://idr.openmicroscopy.org/about/
+    prometheus_http_2xx_external_targets:
+    - https://idr.openmicroscopy.org/about/
+    prometheus_rsync_banner_targets:
+    - idr.openmicroscopy.org:873
+    prometheus_targets:
+    - hosts: ["{{ hostname_ip.stdout | trim }}"]
+      port: 54321
+      jobname: fake-metrics
+      scrape_interval: 5s
+      metrics_path: /alternative-metrics
