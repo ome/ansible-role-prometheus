@@ -50,7 +50,7 @@
     force: yes
     src: file_sd_config-template-yml.j2
   with_items:
-    - "{{ prometheus_targets }}"
+    - "{{ prometheus_sd_targets }}"
 
 # Docker containers
 
@@ -60,22 +60,13 @@
     name: docker-python
     state: present
 
-- name: pull an image
-  become: yes
-  docker_image:
-    name: "{{ item }}"
-  with_items:
-  - prom/alertmanager:v0.6.2
-  - prom/blackbox-exporter:v0.5.0
-  - prom/prometheus:v1.7.0
-
 - name: prometheus | docker alertmanager
   become: yes
   docker_container:
     command: >
       -config.file=/etc/prometheus/alertmanager.yml
       -storage.path=/alertmanager
-    image: prom/alertmanager
+    image: prom/alertmanager:v0.8.0
     name: alertmanager
     published_ports:
     - 9093:9093
@@ -90,8 +81,8 @@
 - name: prometheus | docker blackbox-exporter
   become: yes
   docker_container:
-    command: "-config.file=/etc/prometheus/blackbox-exporter.yml"
-    image: prom/blackbox-exporter
+    command: "--config.file=/etc/prometheus/blackbox-exporter.yml"
+    image: prom/blackbox-exporter:v0.8.1
     name: blackbox-exporter
     published_ports:
     - 9115:9115
@@ -111,7 +102,7 @@
       -web.console.libraries=/usr/share/prometheus/console_libraries
       -web.console.templates=/usr/share/prometheus/consoles
       -alertmanager.url=http://alertmanager:9093
-    image: prom/prometheus
+    image: prom/prometheus:v1.7.1
     links:
     - alertmanager:alertmanager
     - blackbox-exporter:blackbox-exporter

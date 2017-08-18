@@ -89,6 +89,29 @@ scrape_configs:
       - target_label: __address__
         replacement: blackbox-exporter:9115
 
+{% for item in prometheus_targets %}
+
+  - job_name: {{ item.jobname }}
+    scrape_interval: {{ item.scrape_interval | default('15s') }}
+    metrics_path: {{ item.metrics_path | default('/metrics') }}
+    static_configs:
+{%   if 'hosts' in item %}
+    - targets: {{ item.hosts | json_query("map(&join(':', [@, '" + (item.port | string) + "']), @)") | to_json }}
+{%   endif %}
+{%   for group in item.groups | default([]) %}
+{%     for host in groups[group] | default([]) | sort %}
+    - targets:
+      - {{
+          (hostvars[host][
+            'ansible_' + (item.iface | default('eth0'))].ipv4.address +
+            ":" + (item.port | string)) | to_json
+        }}
+      labels:
+        instance: {{ hostvars[host].ansible_hostname }}
+{%     endfor %}
+{%   endfor %}
+{% endfor %}
+
   # Other target files
   # (reloaded automatically, can be used for dynamic updates)
   - job_name: additional targets
