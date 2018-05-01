@@ -35,6 +35,9 @@ ansible:
     docker-hosts:
       # This should allow docker-in-docker to work
       docker_storage_driver: vfs
+      # Latest version 17.12.1.ce-1.el7.centos has a bug that prevents
+      # testing on travis: https://github.com/docker/for-linux/issues/219
+      docker_version: 17.09.1.ce-1.el7.centos
 
 
 verifier:
