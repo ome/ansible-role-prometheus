@@ -36,6 +36,22 @@ Example playbook
       - role: prometheus
 
 
+Testing Slack alerts (manual)
+-----------------------------
+
+Change `prometheus_alertmanager_slack_webhook` in `playbook.yml` to a real Slack webhook. Run:
+
+    molecule test --destroy never
+    molecule login
+    docker stop fake-metrics
+
+Wait a few minutes, a Slack alert should be generated.
+
+If this fails try creating a [manual alert](https://github.com/prometheus/alertmanager/issues/437#issuecomment-263413632):
+
+    curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert1"}}]' localhost:9093/api/v1/alerts
+
+
 Author Information
 ------------------
 
