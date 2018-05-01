@@ -4,7 +4,40 @@
   roles:
     - role: openmicroscopy.docker
 
+
+# Install this role
+- hosts: all
+
+  pre_tasks:
+
+  - name: Workaround to get host IP inside docker
+    shell: hostname -I | cut -d' ' -f1
+    register: hostname_ip
+    check_mode: no
+    changed_when: no
+
+  roles:
+  - role: ansible-role-prometheus
+    prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
+    prometheus_alertmanager_slack_channel: '#general'
+    prometheus_static_targets:
+    - localhost:9090
+    prometheus_http_2xx_internal_targets:
+    - http://idr.openmicroscopy.org/about/
+    prometheus_http_2xx_external_targets:
+    - https://idr.openmicroscopy.org/about/
+    prometheus_rsync_banner_targets:
+    - idr.openmicroscopy.org:873
+    prometheus_targets:
+    - hosts: ["{{ hostname_ip.stdout }}"]
+      port: 54321
+      jobname: fake-metrics
+      scrape_interval: 5s
+      metrics_path: /alternative-metrics
+
+
 # Setup some fake metrics using nginx
+- hosts: all
   tasks:
 
   - name: create fake metric file
@@ -23,34 +56,3 @@
       state: started
       volumes:
       - /srv/:/usr/share/nginx/html/:ro
-
-
-# Finally, install this role
-- hosts: all
-
-  pre_tasks:
-
-  - name: Workaround to get host IP inside docker
-    command: hostname -i
-    register: hostname_ip
-    check_mode: no
-    changed_when: no
-
-  roles:
-  - role: ansible-role-prometheus
-    prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
-    prometheus_alertmanager_slack_channel: '#general'
-    prometheus_static_targets:
-    - localhost:9090
-    prometheus_http_2xx_internal_targets:
-    - http://idr.openmicroscopy.org/about/
-    prometheus_http_2xx_external_targets:
-    - https://idr.openmicroscopy.org/about/
-    prometheus_rsync_banner_targets:
-    - idr.openmicroscopy.org:873
-    prometheus_targets:
-    - hosts: ["{{ hostname_ip.stdout | trim }}"]
-      port: 54321
-      jobname: fake-metrics
-      scrape_interval: 5s
-      metrics_path: /alternative-metrics
