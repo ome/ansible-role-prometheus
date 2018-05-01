@@ -21,10 +21,10 @@
 
 - name: prometheus | prometheus alert rules
   become: yes
-  copy:
-    dest: /etc/prometheus/rules/default-alert.rules
+  template:
+    dest: /etc/prometheus/rules/default-alert.yml
     force: yes
-    src: etc-prometheus-default-alert.rules
+    src: etc-prometheus-default-alert-yml.j2
   register: prometheus_alert_rules
 
 - name: prometheus | alertmanager configuration file
