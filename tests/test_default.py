@@ -8,16 +8,24 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 def test_docker_running(Sudo, Command):
     with Sudo():
-        out = Command.check_output("docker ps --format '{{.Names}}'")
-    names = out.split()
-    assert 'alertmanager' in names
-    assert 'blackbox-exporter' in names
-    assert 'prometheus' in names
+        # BUG: Doesn't work (bug in testinfra?)
+        # docker ps --format '{{.Names}}'
+        out = Command.check_output(
+            "docker ps | tail -n+2 | rev | cut -d' ' -f1 | rev")
+    names = sorted(out.split())
+    assert names == [
+        'alertmanager',
+        'blackbox-exporter',
+        'fake-metrics',
+        'prometheus',
+    ]
 
 
 def test_docker_volumes(Sudo, Command):
     with Sudo():
-        out = Command.check_output("docker volume ls --format '{{.Name}}'")
+        # BUG: Doesn't work (bug in testinfra?)
+        # docker volume ls --format '{{.Name}}'"
+        out = Command.check_output("docker volume ls -q")
     names = sorted(out.split())
     assert names == ['alertmanager-data', 'prometheus-data']
 
