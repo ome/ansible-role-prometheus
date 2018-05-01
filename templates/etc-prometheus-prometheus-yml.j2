@@ -103,7 +103,11 @@ scrape_configs:
     metrics_path: {{ item.metrics_path | default('/metrics') }}
     static_configs:
 {%   if 'hosts' in item %}
-    - targets: {{ item.hosts | json_query("map(&join(':', [@, '" + (item.port | string) + "']), @)") | to_json }}
+    {# BUG in Ansible:
+       https://github.com/ansible/ansible/issues/27299#issuecomment-331068246
+       Workaround: "| to_json | from_json"
+    #}
+    - targets: {{ item.hosts | to_json | from_json | json_query("map(&join(':', [@, '" + (item.port | string) + "']), @)") | to_json }}
 {%   endif %}
 {%   for group in item.groups | default([]) %}
 {%     for host in groups[group] | default([]) | sort %}
