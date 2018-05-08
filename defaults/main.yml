@@ -35,3 +35,8 @@ prometheus_alertmanager_slack_channel: '#random'
 prometheus_http_2xx_internal_targets: []
 prometheus_http_2xx_external_targets: []
 prometheus_rsync_banner_targets: []
+
+# External ports, set to 0 to disable
+prometheus_port: 9090
+prometheus_alertmanger_port: 9093
+prometheus_blackboxexporter_port: 9115
