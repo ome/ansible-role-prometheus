@@ -46,6 +46,22 @@ def test_prometheus_targets(Command):
     assert 'http://blackbox-exporter:9115/probe' in out
 
 
+@pytest.mark.parametrize("jobname", [
+    'prometheus',
+    'blackbox_http_2xx_internal',
+    'fake-metrics',
+])
+def test_prometheus_targets_up(Command, jobname):
+    out = Command.check_output('curl http://localhost:9090/api/v1/targets')
+    targets = json.loads(out)['data']['activeTargets']
+    found = False
+    for t in targets:
+        if t['labels']['job'] == jobname:
+            found = True
+            assert t['health'] == 'up'
+    assert found
+
+
 def test_alternative_metrics(Command):
     out = Command.check_output(
         'curl http://localhost:9090/api/v1/query?query=up')
