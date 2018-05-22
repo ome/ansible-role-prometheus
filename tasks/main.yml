@@ -60,6 +60,12 @@
     name: docker-python
     state: present
 
+- name: prometheus | docker network
+  become: yes
+  docker_network:
+    name: "{{ prometheus_docker_network }}"
+    state: present
+
 - name: prometheus | docker alertmanager
   become: yes
   docker_container:
@@ -68,6 +74,8 @@
       --storage.path=/alertmanager
     image: prom/alertmanager:v0.14.0
     name: alertmanager
+    networks:
+    - name: "{{ prometheus_docker_network }}"
     published_ports: "{{ (prometheus_alertmanger_port > 0) | ternary([(prometheus_alertmanger_port | string) + ':9093'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_alertmanager_configuration.changed }}"
@@ -83,6 +91,8 @@
     command: "--config.file=/etc/prometheus/blackbox-exporter.yml"
     image: prom/blackbox-exporter:v0.12.0
     name: blackbox-exporter
+    networks:
+    - name: "{{ prometheus_docker_network }}"
     published_ports: "{{ (prometheus_blackboxexporter_port > 0) | ternary([(prometheus_blackboxexporter_port | string) + ':9115'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_blackboxexporter_configuration.changed }}"
@@ -100,10 +110,9 @@
       --web.console.libraries=/usr/share/prometheus/console_libraries
       --web.console.templates=/usr/share/prometheus/consoles
     image: prom/prometheus:v2.2.1
-    links:
-    - alertmanager:alertmanager
-    - blackbox-exporter:blackbox-exporter
     name: prometheus
+    networks:
+    - name: "{{ prometheus_docker_network }}"
     published_ports: "{{ (prometheus_port > 0) | ternary([(prometheus_port | string) + ':9090'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"

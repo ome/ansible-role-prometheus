@@ -40,3 +40,7 @@ prometheus_rsync_banner_targets: []
 prometheus_port: 9090
 prometheus_alertmanger_port: 9093
 prometheus_blackboxexporter_port: 9115
+
+
+# Docker network for prometheus components
+prometheus_docker_network: prometheus
