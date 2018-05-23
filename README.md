@@ -29,6 +29,9 @@ Parameters
 - `prometheus_port`: External Prometheus port, set to `0` to disable, default `9090`
 - `prometheus_alertmanger_port`: External Alertmanager port, set to `0` to disable, default `9093`
 - `prometheus_blackboxexporter_port`: External Blackbox-exporter port, set to `0` to disable, default `9115`
+- `prometheus_additional_command_args`: Additional command line arguments for prometheus
+- `prometheus_alertmanager_additional_command_args`: Additional command line arguments for alertmanager
+
 - `prometheus_docker_network`: Docker network for prometheus Docker applications, default `prometheus`
 
 

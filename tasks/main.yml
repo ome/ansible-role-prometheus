@@ -72,6 +72,7 @@
     command: >
       --config.file=/etc/prometheus/alertmanager.yml
       --storage.path=/alertmanager
+      {{ prometheus_alertmanager_additional_command_args }}
     image: prom/alertmanager:v0.14.0
     name: alertmanager
     networks:
@@ -109,6 +110,7 @@
       --storage.tsdb.path=/prometheus
       --web.console.libraries=/usr/share/prometheus/console_libraries
       --web.console.templates=/usr/share/prometheus/consoles
+      {{ prometheus_additional_command_args }}
     image: prom/prometheus:v2.2.1
     name: prometheus
     networks:

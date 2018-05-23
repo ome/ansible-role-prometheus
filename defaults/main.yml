@@ -41,6 +41,11 @@ prometheus_port: 9090
 prometheus_alertmanger_port: 9093
 prometheus_blackboxexporter_port: 9115
 
+# Additional command line arguments for prometheus
+prometheus_additional_command_args: ''
+
+# Additional command line arguments for alertmanager
+prometheus_alertmanager_additional_command_args: ''
 
 # Docker network for prometheus components
 prometheus_docker_network: prometheus
