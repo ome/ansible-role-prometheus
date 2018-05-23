@@ -77,7 +77,7 @@
     name: alertmanager
     networks:
     - name: "{{ prometheus_docker_network }}"
-    published_ports: "{{ (prometheus_alertmanger_port > 0) | ternary([(prometheus_alertmanger_port | string) + ':9093'], []) }}"
+    published_ports: "{{ (prometheus_alertmanager_port > 0) | ternary([(prometheus_alertmanager_port | string) + ':9093'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_alertmanager_configuration.changed }}"
     restart_policy: always

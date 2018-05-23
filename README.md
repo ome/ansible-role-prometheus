@@ -27,7 +27,7 @@ Parameters
   In practice these configuration files could be dynamically generated outside this role, prometheus will automatically reload them.
  External ports, set to 0 to disable
 - `prometheus_port`: External Prometheus port, set to `0` to disable, default `9090`
-- `prometheus_alertmanger_port`: External Alertmanager port, set to `0` to disable, default `9093`
+- `prometheus_alertmanager_port`: External Alertmanager port, set to `0` to disable, default `9093`
 - `prometheus_blackboxexporter_port`: External Blackbox-exporter port, set to `0` to disable, default `9115`
 - `prometheus_additional_command_args`: Additional command line arguments for prometheus
 - `prometheus_alertmanager_additional_command_args`: Additional command line arguments for alertmanager
