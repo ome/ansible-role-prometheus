@@ -22,6 +22,10 @@ prometheus_alert_group_interval: 5m
 prometheus_alert_repeat_interval: 3h
 
 
+# Default times for scrape failures
+prometheus_alertmanager_instance_down_warn: 5s
+prometheus_alertmanager_instance_down_error: 2m
+
 # Slack
 prometheus_alertmanager_slack_webhook:
 prometheus_alertmanager_slack_channel: '#random'
@@ -31,3 +35,27 @@ prometheus_alertmanager_slack_channel: '#random'
 prometheus_http_2xx_internal_targets: []
 prometheus_http_2xx_external_targets: []
 prometheus_rsync_banner_targets: []
+
+# External ports, set to 0 to disable
+prometheus_port: 9090
+prometheus_alertmanager_port: 9093
+prometheus_blackboxexporter_port: 9115
+
+# Additional command line arguments for prometheus
+prometheus_additional_command_args: ''
+
+# Additional command line arguments for alertmanager
+prometheus_alertmanager_additional_command_args: ''
+
+# Docker network for prometheus components
+prometheus_docker_network: prometheus
+
+
+######################################################################
+# Expert users only!
+######################################################################
+
+# Prometheus component versions
+prometheus_version: 2.2.1
+prometheus_alertmanager_version: 0.14.0
+prometheus_blackboxexporter_version: 0.12.0

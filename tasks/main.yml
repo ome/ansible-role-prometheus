@@ -21,10 +21,10 @@
 
 - name: prometheus | prometheus alert rules
   become: yes
-  copy:
-    dest: /etc/prometheus/rules/default-alert.rules
+  template:
+    dest: /etc/prometheus/rules/default-alert.rules.yml
     force: yes
-    src: etc-prometheus-default-alert.rules
+    src: etc-prometheus-default-alert-rules-yml.j2
   register: prometheus_alert_rules
 
 - name: prometheus | alertmanager configuration file
@@ -60,16 +60,24 @@
     name: docker-python
     state: present
 
+- name: prometheus | docker network
+  become: yes
+  docker_network:
+    name: "{{ prometheus_docker_network }}"
+    state: present
+
 - name: prometheus | docker alertmanager
   become: yes
   docker_container:
     command: >
-      -config.file=/etc/prometheus/alertmanager.yml
-      -storage.path=/alertmanager
-    image: prom/alertmanager:v0.8.0
+      --config.file=/etc/prometheus/alertmanager.yml
+      --storage.path=/alertmanager
+      {{ prometheus_alertmanager_additional_command_args }}
+    image: prom/alertmanager:v{{ prometheus_alertmanager_version }}
     name: alertmanager
-    published_ports:
-    - 9093:9093
+    networks:
+    - name: "{{ prometheus_docker_network }}"
+    published_ports: "{{ (prometheus_alertmanager_port > 0) | ternary([(prometheus_alertmanager_port | string) + ':9093'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_alertmanager_configuration.changed }}"
     restart_policy: always
@@ -82,10 +90,11 @@
   become: yes
   docker_container:
     command: "--config.file=/etc/prometheus/blackbox-exporter.yml"
-    image: prom/blackbox-exporter:v0.8.1
+    image: prom/blackbox-exporter:v{{ prometheus_blackboxexporter_version }}
     name: blackbox-exporter
-    published_ports:
-    - 9115:9115
+    networks:
+    - name: "{{ prometheus_docker_network }}"
+    published_ports: "{{ (prometheus_blackboxexporter_port > 0) | ternary([(prometheus_blackboxexporter_port | string) + ':9115'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_blackboxexporter_configuration.changed }}"
     restart_policy: always
@@ -97,18 +106,16 @@
   become: yes
   docker_container:
     command: >
-      -config.file=/etc/prometheus/prometheus.yml
-      -storage.local.path=/prometheus
-      -web.console.libraries=/usr/share/prometheus/console_libraries
-      -web.console.templates=/usr/share/prometheus/consoles
-      -alertmanager.url=http://alertmanager:9093
-    image: prom/prometheus:v1.7.1
-    links:
-    - alertmanager:alertmanager
-    - blackbox-exporter:blackbox-exporter
+      --config.file=/etc/prometheus/prometheus.yml
+      --storage.tsdb.path=/prometheus
+      --web.console.libraries=/usr/share/prometheus/console_libraries
+      --web.console.templates=/usr/share/prometheus/consoles
+      {{ prometheus_additional_command_args }}
+    image: prom/prometheus:v{{ prometheus_version }}
     name: prometheus
-    published_ports:
-    - 9090:9090
+    networks:
+    - name: "{{ prometheus_docker_network }}"
+    published_ports: "{{ (prometheus_port > 0) | ternary([(prometheus_port | string) + ':9090'], []) }}"
     #read_only: True
     recreate: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"
     restart_policy: always
