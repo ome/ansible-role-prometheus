@@ -49,3 +49,13 @@ prometheus_alertmanager_additional_command_args: ''
 
 # Docker network for prometheus components
 prometheus_docker_network: prometheus
+
+
+######################################################################
+# Expert users only!
+######################################################################
+
+# Prometheus component versions
+prometheus_version: 2.2.1
+prometheus_alertmanager_version: 0.14.0
+prometheus_blackboxexporter_version: 0.12.0
