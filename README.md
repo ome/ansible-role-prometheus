@@ -1,6 +1,9 @@
 Prometheus
 ==========
 
+[![Build Status](https://travis-ci.org/ome/ansible-role-prometheus.svg)](https://travis-ci.org/ome/ansible-role-prometheus)
+[![Ansible Role](https://img.shields.io/ansible/role/41085.svg)](https://galaxy.ansible.com/ome/prometheus/)
+
 Prometheus monitoring server, includes prometheus, alertmanager and blackbox-exporter.
 This requires docker to be running (not handled by this role).
 
@@ -40,8 +43,8 @@ Example playbook
 
     - hosts: localhost
       roles:
-      - role: openmicroscopy.docker
-      - role: prometheus
+      - role: ome.docker
+      - role: ome.prometheus
 
 
 Testing Slack alerts (manual)

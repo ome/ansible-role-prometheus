@@ -2,7 +2,7 @@
 # Run docker role first to ensure all handlers are triggered
 - hosts: all
   roles:
-    - role: openmicroscopy.docker
+    - role: ome.docker
 
 
 # Install this role
