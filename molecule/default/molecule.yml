@@ -1,0 +1,35 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: molecule/default/requirements.yml
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  - name: prometheus
+    image: centos/systemd:latest
+    privileged: true
+    command: /sbin/init
+    groups:
+      - docker-hosts
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  inventory:
+    group_vars:
+      docker-hosts:
+        # This should allow docker-in-docker to work
+        docker_storage_driver: vfs
+        # Latest version 17.12.1.ce-1.el7.centos has a bug that prevents
+        # testing on travis: https://github.com/docker/for-linux/issues/219
+        docker_version: 17.09.1.ce-1.el7.centos
+        # docker_use_ipv4_nic_mtu: true
+scenario:
+  name: default
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

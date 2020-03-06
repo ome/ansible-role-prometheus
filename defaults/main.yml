@@ -2,7 +2,7 @@
 # defaults file for ansible-role-prometheus
 
 prometheus_static_targets:
-- 'localhost:9090'
+  - 'localhost:9090'
 
 prometheus_targets: []
 

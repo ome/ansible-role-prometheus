@@ -2,52 +2,52 @@
 # tasks file for prometheus
 
 - name: prometheus | create directories
-  become: yes
+  become: true
   file:
     path: "{{ item }}"
     state: directory
   with_items:
-  - /etc/prometheus
-  - /etc/prometheus/rules
-  - /etc/prometheus/targets
+    - /etc/prometheus
+    - /etc/prometheus/rules
+    - /etc/prometheus/targets
 
 - name: prometheus | prometheus configuration file
-  become: yes
+  become: true
   template:
     dest: /etc/prometheus/prometheus.yml
-    force: yes
+    force: true
     src: etc-prometheus-prometheus-yml.j2
   register: prometheus_configuration
 
 - name: prometheus | prometheus alert rules
-  become: yes
+  become: true
   template:
     dest: /etc/prometheus/rules/default-alert.rules.yml
-    force: yes
+    force: true
     src: etc-prometheus-default-alert-rules-yml.j2
   register: prometheus_alert_rules
 
 - name: prometheus | alertmanager configuration file
-  become: yes
+  become: true
   template:
     dest: /etc/prometheus/alertmanager.yml
-    force: yes
+    force: true
     src: etc-prometheus-alertmanager-yml.j2
   register: prometheus_alertmanager_configuration
 
 - name: prometheus | blackbox configuration file
-  become: yes
+  become: true
   copy:
     dest: /etc/prometheus/blackbox-exporter.yml
-    force: yes
+    force: true
     src: etc-prometheus-blackbox-exporter.yml
   register: prometheus_blackboxexporter_configuration
 
 - name: prometheus | file sd configs
-  become: yes
+  become: true
   template:
     dest: /etc/prometheus/targets/{{ item.groupname }}.yml
-    force: yes
+    force: true
     src: file_sd_config-template-yml.j2
   with_items:
     - "{{ prometheus_sd_targets }}"
@@ -55,19 +55,19 @@
 # Docker containers
 
 - name: prometheus | docker-python
-  become: yes
+  become: true
   yum:
     name: docker-python
     state: present
 
 - name: prometheus | docker network
-  become: yes
+  become: true
   docker_network:
     name: "{{ prometheus_docker_network }}"
     state: present
 
 - name: prometheus | docker alertmanager
-  become: yes
+  become: true
   docker_container:
     command: >
       --config.file=/etc/prometheus/alertmanager.yml
@@ -76,34 +76,39 @@
     image: prom/alertmanager:v{{ prometheus_alertmanager_version }}
     name: alertmanager
     networks:
-    - name: "{{ prometheus_docker_network }}"
-    published_ports: "{{ (prometheus_alertmanager_port > 0) | ternary([(prometheus_alertmanager_port | string) + ':9093'], []) }}"
-    #read_only: True
+      - name: "{{ prometheus_docker_network }}"
+    published_ports: >-
+      {{ (prometheus_alertmanager_port > 0) |
+         ternary([(prometheus_alertmanager_port | string) + ':9093'], []) }}
+    # read_only: True
     recreate: "{{ prometheus_alertmanager_configuration.changed }}"
     restart_policy: always
     state: started
     volumes:
-    - /etc/prometheus/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
-    - alertmanager-data:/alertmanager
+      - /etc/prometheus/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
 
 - name: prometheus | docker blackbox-exporter
-  become: yes
+  become: true
   docker_container:
     command: "--config.file=/etc/prometheus/blackbox-exporter.yml"
     image: prom/blackbox-exporter:v{{ prometheus_blackboxexporter_version }}
     name: blackbox-exporter
     networks:
-    - name: "{{ prometheus_docker_network }}"
-    published_ports: "{{ (prometheus_blackboxexporter_port > 0) | ternary([(prometheus_blackboxexporter_port | string) + ':9115'], []) }}"
-    #read_only: True
+      - name: "{{ prometheus_docker_network }}"
+    published_ports: >-
+      {{ (prometheus_blackboxexporter_port > 0) |
+         ternary([(prometheus_blackboxexporter_port | string) + ':9115'],
+         []) }}
+    # read_only: True
     recreate: "{{ prometheus_blackboxexporter_configuration.changed }}"
     restart_policy: always
     state: started
     volumes:
-    - /etc/prometheus/blackbox-exporter.yml:/etc/prometheus/blackbox-exporter.yml:ro
+      - /etc/prometheus/blackbox-exporter.yml:/etc/prometheus/blackbox-exporter.yml:ro
 
 - name: prometheus | docker prometheus
-  become: yes
+  become: true
   docker_container:
     command: >
       --config.file=/etc/prometheus/prometheus.yml
@@ -114,19 +119,22 @@
     image: prom/prometheus:v{{ prometheus_version }}
     name: prometheus
     networks:
-    - name: "{{ prometheus_docker_network }}"
-    published_ports: "{{ (prometheus_port > 0) | ternary([(prometheus_port | string) + ':9090'], []) }}"
-    #read_only: True
-    recreate: "{{ prometheus_configuration.changed or prometheus_alert_rules.changed }}"
+      - name: "{{ prometheus_docker_network }}"
+    published_ports: >-
+      {{ (prometheus_port > 0) | ternary([(prometheus_port | string) +
+         ':9090'], []) }}
+    # read_only: True
+    recreate: >-
+      {{ prometheus_configuration.changed or prometheus_alert_rules.changed }}
     restart_policy: always
     state: started
     volumes:
-    # We could mount /etc/prometheus instead but the Docker image contains
-    # additional (optional) files
-    - /etc/prometheus/rules/:/etc/prometheus/rules/:ro
-    - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    - /etc/prometheus/targets/:/etc/prometheus/targets/:ro
-    - prometheus-data:/prometheus
+      # We could mount /etc/prometheus instead but the Docker image contains
+      # additional (optional) files
+      - /etc/prometheus/rules/:/etc/prometheus/rules/:ro
+      - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /etc/prometheus/targets/:/etc/prometheus/targets/:ro
+      - prometheus-data:/prometheus
 
 # In certain situations if a manual change means Prometheus in Docker
 # auto restarted but a host mounted file wasn't present it'll be auto
@@ -135,9 +143,9 @@
   stat:
     path: "{{ item }}"
   with_items:
-  - /etc/prometheus/alertmanager.yml
-  - /etc/prometheus/blackbox-exporter.yml
-  - /etc/prometheus/prometheus.yml
+    - /etc/prometheus/alertmanager.yml
+    - /etc/prometheus/blackbox-exporter.yml
+    - /etc/prometheus/prometheus.yml
   register: prometheus_docker_file_mounts
 
 - name: prometheus | assert docker host file mounts

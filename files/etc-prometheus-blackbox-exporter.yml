@@ -1,3 +1,4 @@
+---
 # {{ ansible_managed }}
 # https://github.com/prometheus/blackbox_exporter
 
@@ -16,7 +17,7 @@ modules:
     timeout: 5s
     tcp:
       query_response:
-      - expect: "^@RSYNCD:"
+        - expect: "^@RSYNCD:"
   tcp_connect:
     prober: tcp
     timeout: 5s
@@ -25,7 +26,7 @@ modules:
     timeout: 5s
     tcp:
       query_response:
-      - expect: "^SSH-2.0-"
+        - expect: "^SSH-2.0-"
   icmp:
     prober: icmp
     timeout: 5s
