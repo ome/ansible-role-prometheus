@@ -27,6 +27,14 @@
     src: etc-prometheus-default-alert-rules-yml.j2
   register: prometheus_alert_rules
 
+- name: prometheus | prometheus additional alert rules
+  become: true
+  template:
+    dest: /etc/prometheus/rules/additional-alert.rules.yml
+    force: true
+    src: "{{ prometheus_additional_rules_template }}"
+  register: prometheus_alert_rules_additional
+
 - name: prometheus | alertmanager configuration file
   become: true
   template:
@@ -125,7 +133,9 @@
          ':9090'], []) }}
     # read_only: True
     recreate: >-
-      {{ prometheus_configuration.changed or prometheus_alert_rules.changed }}
+      {{ prometheus_configuration.changed or
+         prometheus_alert_rules.changed or
+         prometheus_alert_rules_additional.changed }}
     restart_policy: always
     state: started
     volumes:

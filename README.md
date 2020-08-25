@@ -34,6 +34,9 @@ Parameters
 - `prometheus_blackboxexporter_port`: External Blackbox-exporter port, set to `0` to disable, default `9115`
 - `prometheus_additional_command_args`: Additional command line arguments for prometheus
 - `prometheus_alertmanager_additional_command_args`: Additional command line arguments for alertmanager
+- `prometheus_additional_rules_template`: Template with additional alert rules.
+  See https://awesome-prometheus-alerts.grep.to/rules for some ideas but note the labels may be different.
+
 
 - `prometheus_docker_network`: Docker network for prometheus Docker applications, default `prometheus`
 

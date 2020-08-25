@@ -8,6 +8,12 @@ prometheus_targets: []
 
 prometheus_sd_targets: []
 
+# Template with additional alert rules
+# Defaults to an empty placeholder file as this is easier than conditionally
+# deleting a file if it's not needed
+prometheus_additional_rules_template:
+  "etc-prometheus-additional-alert-rules-yml.j2"
+
 # https://github.com/prometheus/alertmanager#example
 # When a new group of alerts is created by an incoming alert, wait at
 # least 'group_wait' to send the initial notification.
