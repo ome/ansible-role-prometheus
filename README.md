@@ -65,6 +65,14 @@ If this fails try creating a [manual alert](https://github.com/prometheus/alertm
 
     curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert1"}}]' localhost:9093/api/v1/alerts
 
+The molecule test also includes a disk space alert configuration.
+To test this fill up at least 90% of the `/run` partition:
+
+    molecule login
+    dd if=/dev/zero of=/run/fill.space bs=1M count=...
+
+Wait a few minutes and you should see a disk space warning.
+
 
 Author Information
 ------------------
