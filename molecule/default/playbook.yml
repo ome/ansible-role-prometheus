@@ -34,14 +34,23 @@
         - idr.openmicroscopy.org:873
       prometheus_targets:
         - hosts: ["{{ hostname_ip.stdout }}"]
+          port: 9100
+          jobname: nodes
+          scrape_interval: 5s
+        - hosts: ["{{ hostname_ip.stdout }}"]
           port: 54321
           jobname: fake-metrics
           scrape_interval: 5s
           metrics_path: /alternative-metrics
+      prometheus_additional_rules_template: example-rules-yml.j2
 
 
-# Setup some fake metrics using nginx
+# Setup some real and fake metrics using nginx
 - hosts: all
+
+  roles:
+    - role: ome.prometheus_node
+
   tasks:
 
     - name: create fake metric file

@@ -14,6 +14,8 @@ platforms:
     command: /sbin/init
     groups:
       - docker-hosts
+      # published_ports:
+      #   - "0.0.0.0:9090:9090/tcp"
 provisioner:
   name: ansible
   lint:

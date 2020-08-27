@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+# See https://awesome-prometheus-alerts.grep.to/rules
+# for useful rules but note the labels may be different
+# Remember this is a Jinja2 template processed by Ansible
+
+{% raw %}
+
+groups:
+
+- name: 10% disk space remaining
+  rules:
+
+  - alert: HostOutOfDiskSpace
+    expr: (node_filesystem_avail_bytes{mountpoint="/run"} * 100) / node_filesystem_size_bytes{mountpoint="/run"} < 10
+    # for: 5m
+    for: 10s
+    labels:
+      severity: warn
+    annotations:
+      summary: "Host out of disk space (instance {{ $labels.instance }})"
+      description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+{% endraw -%}

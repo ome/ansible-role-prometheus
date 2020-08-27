@@ -34,6 +34,9 @@ Parameters
 - `prometheus_blackboxexporter_port`: External Blackbox-exporter port, set to `0` to disable, default `9115`
 - `prometheus_additional_command_args`: Additional command line arguments for prometheus
 - `prometheus_alertmanager_additional_command_args`: Additional command line arguments for alertmanager
+- `prometheus_additional_rules_template`: Template with additional alert rules.
+  See https://awesome-prometheus-alerts.grep.to/rules for some ideas but note the labels may be different.
+
 
 - `prometheus_docker_network`: Docker network for prometheus Docker applications, default `prometheus`
 
@@ -61,6 +64,14 @@ Wait a few minutes, a Slack alert should be generated.
 If this fails try creating a [manual alert](https://github.com/prometheus/alertmanager/issues/437#issuecomment-263413632):
 
     curl -H "Content-Type: application/json" -d '[{"labels":{"alertname":"TestAlert1"}}]' localhost:9093/api/v1/alerts
+
+The molecule test also includes a disk space alert configuration.
+To test this fill up at least 90% of the `/run` partition:
+
+    molecule login
+    dd if=/dev/zero of=/run/fill.space bs=1M count=...
+
+Wait a few minutes and you should see a disk space warning.
 
 
 Author Information

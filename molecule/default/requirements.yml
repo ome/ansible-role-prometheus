@@ -1,2 +1,4 @@
 ---
 - src: ome.docker
+
+- src: ome.prometheus_node
