@@ -26,9 +26,10 @@ Parameters
   - `hosts`: A list of hosts (optional)
   - `port`: The port to be monitored
   - `jobname`: The prometheus job-name
+
   This is intended to be an example.
   In practice these configuration files could be dynamically generated outside this role, prometheus will automatically reload them.
- External ports, set to 0 to disable
+- `prometheus_custom_targets`: Optional list of dictionaries of additional targets with custom arguments, use this if you need to pass custom arguments that aren't supported by the previous two parameters. Each item will be used verbatim, no processing is done
 - `prometheus_port`: External Prometheus port, set to `0` to disable, default `9090`
 - `prometheus_alertmanager_port`: External Alertmanager port, set to `0` to disable, default `9093`
 - `prometheus_blackboxexporter_port`: External Blackbox-exporter port, set to `0` to disable, default `9115`

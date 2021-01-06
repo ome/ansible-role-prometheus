@@ -129,3 +129,8 @@ scrape_configs:
     file_sd_configs:
     - files:
       - "/etc/prometheus/targets/*.yml"
+
+  # Targets requiring custom options
+{% for item in prometheus_custom_targets %}
+  - {{ item | to_json }}
+{% endfor %}
