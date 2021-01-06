@@ -40,6 +40,8 @@ Parameters
 
 
 - `prometheus_docker_network`: Docker network for prometheus Docker applications, default `prometheus`
+- `prometheus_docker_user`: User ID that prometheus should run as, default is the container default
+- `prometheus_docker_data_volume`: Docker volume or host path for Prometheus data, default is a docker volume called `prometheus-data`. If this is a host path it must be writeable by `prometheus_docker_user`.
 
 
 Example playbook

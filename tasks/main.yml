@@ -138,13 +138,14 @@
          prometheus_alert_rules_additional.changed }}
     restart_policy: always
     state: started
+    user: "{{ prometheus_docker_user | default(omit) }}"
     volumes:
       # We could mount /etc/prometheus instead but the Docker image contains
       # additional (optional) files
       - /etc/prometheus/rules/:/etc/prometheus/rules/:ro
       - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - /etc/prometheus/targets/:/etc/prometheus/targets/:ro
-      - prometheus-data:/prometheus
+      - "{{ prometheus_docker_data_volume }}:/prometheus"
 
 # In certain situations if a manual change means Prometheus in Docker
 # auto restarted but a host mounted file wasn't present it'll be auto
