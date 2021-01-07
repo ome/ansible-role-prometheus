@@ -44,6 +44,16 @@ Parameters
 - `prometheus_docker_data_volume`: Docker volume or host path for Prometheus data, default is a docker volume called `prometheus-data`. If this is a host path it must be writeable by `prometheus_docker_user`.
 
 
+Outputs
+-------
+This role sets the following variables which can be used in other tasks:
+- `prometheus_internal_ip`: Internal IP of the Prometheus container
+- `prometheus_blackboxexporter_internal_ip`: Internal IP of the Blackbox exporter container
+- `prometheus_alertmanager_internal_ip`: Internal IP of the AlertManager container
+
+These are intended for use when you don't want to expose the container ports using standard Docker port-forwarding (set `prometheus_*port: 0`).
+
+
 Example playbook
 ----------------
 
