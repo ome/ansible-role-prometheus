@@ -95,6 +95,7 @@
     volumes:
       - /etc/prometheus/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
       - alertmanager-data:/alertmanager
+  register: _alertmanager_container
 
 - name: prometheus | docker blackbox-exporter
   become: true
@@ -114,6 +115,7 @@
     state: started
     volumes:
       - /etc/prometheus/blackbox-exporter.yml:/etc/prometheus/blackbox-exporter.yml:ro
+  register: _blackboxexporter_container
 
 - name: prometheus | docker prometheus
   become: true
@@ -138,13 +140,15 @@
          prometheus_alert_rules_additional.changed }}
     restart_policy: always
     state: started
+    user: "{{ prometheus_docker_user | default(omit) }}"
     volumes:
       # We could mount /etc/prometheus instead but the Docker image contains
       # additional (optional) files
       - /etc/prometheus/rules/:/etc/prometheus/rules/:ro
       - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - /etc/prometheus/targets/:/etc/prometheus/targets/:ro
-      - prometheus-data:/prometheus
+      - "{{ prometheus_docker_data_volume }}:/prometheus"
+  register: _prometheus_container
 
 # In certain situations if a manual change means Prometheus in Docker
 # auto restarted but a host mounted file wasn't present it'll be auto
@@ -166,3 +170,27 @@
   # (there's nothing senstive in there)
   # The asserts will be in the same order as the previous task
   no_log: true
+
+- name: prometheus | return container IPs
+  set_fact:
+    # These default() are needed because the "X.container" property is the
+    # recommended way to access this information but Ansible 2.6 only has the
+    # deprecated "X.ansible_facts.docker_container" property
+    prometheus_internal_ip: >-
+      {{
+        (_prometheus_container.container | default(
+           _prometheus_container.ansible_facts.docker_container)
+        ).NetworkSettings.IPAddress
+      }}
+    prometheus_blackboxexporter_internal_ip: >-
+      {{
+        (_blackboxexporter_container.container | default(
+           _blackboxexporter_container.ansible_facts.docker_container)
+        ).NetworkSettings.IPAddress
+      }}
+    prometheus_alertmanager_internal_ip: >-
+      {{
+        (_alertmanager_container.container | default(
+           _alertmanager_container.ansible_facts.docker_container)
+        ).NetworkSettings.IPAddress
+      }}

@@ -8,6 +8,8 @@ prometheus_targets: []
 
 prometheus_sd_targets: []
 
+prometheus_custom_targets: []
+
 # Template with additional alert rules
 # Defaults to an empty placeholder file as this is easier than conditionally
 # deleting a file if it's not needed
@@ -55,6 +57,12 @@ prometheus_alertmanager_additional_command_args: ''
 
 # Docker network for prometheus components
 prometheus_docker_network: prometheus
+
+# User ID that prometheus should run as, default is the container default
+# prometheus_docker_user:
+
+# Volume for prometheus data
+prometheus_docker_data_volume: prometheus-data
 
 
 ######################################################################
