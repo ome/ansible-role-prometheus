@@ -1,7 +1,7 @@
 Prometheus
 ==========
 
-[![Build Status](https://travis-ci.org/ome/ansible-role-prometheus.svg)](https://travis-ci.org/ome/ansible-role-prometheus)
+[![Actions Status](https://github.com/ome/ansible-role-prometheus/workflows/Molecule/badge.svg)](https://github.com/ome/ansible-role-prometheus/actions)
 [![Ansible Role](https://img.shields.io/ansible/role/41324.svg)](https://galaxy.ansible.com/ome/prometheus/)
 
 Prometheus monitoring server, includes prometheus, alertmanager and blackbox-exporter.
