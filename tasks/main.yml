@@ -6,6 +6,7 @@
   file:
     path: "{{ item }}"
     state: directory
+    mode: 0755
   with_items:
     - /etc/prometheus
     - /etc/prometheus/rules
@@ -17,6 +18,7 @@
     dest: /etc/prometheus/prometheus.yml
     force: true
     src: etc-prometheus-prometheus-yml.j2
+    mode: 0644
   register: prometheus_configuration
 
 - name: prometheus | prometheus alert rules
@@ -25,6 +27,7 @@
     dest: /etc/prometheus/rules/default-alert.rules.yml
     force: true
     src: etc-prometheus-default-alert-rules-yml.j2
+    mode: 0644
   register: prometheus_alert_rules
 
 - name: prometheus | prometheus additional alert rules
@@ -33,6 +36,7 @@
     dest: /etc/prometheus/rules/additional-alert.rules.yml
     force: true
     src: "{{ prometheus_additional_rules_template }}"
+    mode: 0644
   register: prometheus_alert_rules_additional
 
 - name: prometheus | alertmanager configuration file
@@ -41,6 +45,7 @@
     dest: /etc/prometheus/alertmanager.yml
     force: true
     src: etc-prometheus-alertmanager-yml.j2
+    mode: 0644
   register: prometheus_alertmanager_configuration
 
 - name: prometheus | blackbox configuration file
@@ -49,6 +54,7 @@
     dest: /etc/prometheus/blackbox-exporter.yml
     force: true
     src: etc-prometheus-blackbox-exporter.yml
+    mode: 0644
   register: prometheus_blackboxexporter_configuration
 
 - name: prometheus | file sd configs
@@ -57,6 +63,7 @@
     dest: /etc/prometheus/targets/{{ item.groupname }}.yml
     force: true
     src: file_sd_config-template-yml.j2
+    mode: 0644
   with_items:
     - "{{ prometheus_sd_targets }}"
 
