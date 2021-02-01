@@ -58,6 +58,7 @@
       copy:
         content: fake_metric_value 5
         dest: /srv/alternative-metrics
+        mode: 0644
 
     - name: fake metric server
       become: true
