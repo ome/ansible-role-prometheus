@@ -21,7 +21,7 @@
         - skip_ansible_lint
 
   roles:
-    - role: ansible-role-prometheus
+    - role: ome.prometheus
       prometheus_alertmanager_slack_webhook: SLACK_WEBHOOK
       prometheus_alertmanager_slack_channel: '#general'
       prometheus_static_targets:
