@@ -2,7 +2,7 @@ Prometheus
 ==========
 
 [![Actions Status](https://github.com/ome/ansible-role-prometheus/workflows/Molecule/badge.svg)](https://github.com/ome/ansible-role-prometheus/actions)
-[![Ansible Role](https://img.shields.io/ansible/role/41324.svg)](https://galaxy.ansible.com/ome/prometheus/)
+[![Ansible Role](https://img.shields.io/badge/ansible--galaxy-prometheus-blue.svg)](https://galaxy.ansible.com/ui/standalone/roles/ome/prometheus/)
 
 Prometheus monitoring server, includes prometheus, alertmanager and blackbox-exporter.
 This requires docker to be running (not handled by this role).
