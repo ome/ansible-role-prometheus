@@ -9,10 +9,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 def test_docker_running(host):
     with host.sudo():
-        # BUG: Doesn't work (bug in testinfra?)
-        # docker ps --format '{{.Names}}'
-        out = host.check_output(
-            "docker ps | tail -n+2 | rev | cut -d' ' -f1 | rev")
+        out = host.check_output("docker ps --format '{{.Names}}'")
     names = sorted(out.split())
     assert names == [
         'alertmanager',
