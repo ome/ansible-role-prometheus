@@ -4,11 +4,11 @@ galaxy_info:
   description: Prometheus monitoring server
   company: Open Microscopy Environment
   license: BSD
-  min_ansible_version: 2.3
+  min_ansible_version: 2.10
   platforms:
     - name: EL
       versions:
-        - 7
+        - 9
   role_name: prometheus
   namespace: ome
   galaxy_tags: []
