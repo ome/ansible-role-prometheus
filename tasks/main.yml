@@ -18,7 +18,7 @@
 
 - name: prometheus | create directories
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: 0755
@@ -29,7 +29,7 @@
 
 - name: prometheus | prometheus configuration file
   become: true
-  template:
+  ansible.builtin.template:
     dest: /etc/prometheus/prometheus.yml
     force: true
     src: etc-prometheus-prometheus-yml.j2
@@ -38,7 +38,7 @@
 
 - name: prometheus | prometheus alert rules
   become: true
-  template:
+  ansible.builtin.template:
     dest: /etc/prometheus/rules/default-alert.rules.yml
     force: true
     src: etc-prometheus-default-alert-rules-yml.j2
@@ -47,7 +47,7 @@
 
 - name: prometheus | prometheus additional alert rules
   become: true
-  template:
+  ansible.builtin.template:
     dest: /etc/prometheus/rules/additional-alert.rules.yml
     force: true
     src: "{{ prometheus_additional_rules_template }}"
@@ -56,7 +56,7 @@
 
 - name: prometheus | alertmanager configuration file
   become: true
-  template:
+  ansible.builtin.template:
     dest: /etc/prometheus/alertmanager.yml
     force: true
     src: etc-prometheus-alertmanager-yml.j2
@@ -65,7 +65,7 @@
 
 - name: prometheus | blackbox configuration file
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: /etc/prometheus/blackbox-exporter.yml
     force: true
     src: etc-prometheus-blackbox-exporter.yml
@@ -74,7 +74,7 @@
 
 - name: prometheus | file sd configs
   become: true
-  template:
+  ansible.builtin.template:
     dest: /etc/prometheus/targets/{{ item.groupname }}.yml
     force: true
     src: file_sd_config-template-yml.j2
@@ -86,19 +86,19 @@
 
 - name: prometheus | docker-python
   become: true
-  yum:
+  ansible.builtin.dnf:
     name: python3-docker
     state: present
 
 - name: prometheus | docker network
   become: true
-  docker_network:
+  ansible.builtin.docker_network:
     name: "{{ prometheus_docker_network }}"
     state: present
 
 - name: prometheus | docker alertmanager
   become: true
-  docker_container:
+  community.docker.docker_container:
     command: >
       --config.file=/etc/prometheus/alertmanager.yml
       --storage.path=/alertmanager
@@ -121,7 +121,7 @@
 
 - name: prometheus | docker blackbox-exporter
   become: true
-  docker_container:
+  community.docker.docker_container:
     command: "--config.file=/etc/prometheus/blackbox-exporter.yml"
     image: prom/blackbox-exporter:v{{ prometheus_blackboxexporter_version }}
     name: blackbox-exporter
@@ -141,7 +141,7 @@
 
 - name: prometheus | docker prometheus
   become: true
-  docker_container:
+  community.docker.docker_container:
     command: >
       --config.file=/etc/prometheus/prometheus.yml
       --storage.tsdb.path=/prometheus
@@ -176,7 +176,7 @@
 # auto restarted but a host mounted file wasn't present it'll be auto
 # created as a directory instead of a file.
 - name: prometheus | check docker host file mounts
-  stat:
+  ansible.builtin.stat:
     path: "{{ item }}"
   with_items:
     - /etc/prometheus/alertmanager.yml
@@ -185,7 +185,7 @@
   register: prometheus_docker_file_mounts
 
 - name: prometheus | assert docker host file mounts
-  assert:
+  ansible.builtin.assert:
     that: 'item.stat.isreg'
   with_items: "{{ prometheus_docker_file_mounts.results }}"
   # This is a sanity check so use no_log to reduce the excessive log output
@@ -194,7 +194,7 @@
   no_log: true
 
 - name: prometheus | return container IPs
-  set_fact:
+  ansible.builtin.set_fact:
     # These default() are needed because the "X.container" property is the
     # recommended way to access this information but Ansible 2.6 only has the
     # deprecated "X.ansible_facts.docker_container" property
